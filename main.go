@@ -2,13 +2,14 @@ package main
 
 import (
 	"bufio"
-	"calc/numerals"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strconv"
 	"strings"
+
+	"calc/numerals"
 )
 
 var (
@@ -23,17 +24,17 @@ var (
 )
 
 type calculator struct {
-	operators map[string]func() int
-	operator  string
-	a, b      int
-	reader    *bufio.Reader
-	roman     bool
+	operations map[string]func() int
+	operator   string
+	a, b       int
+	reader     *bufio.Reader
+	roman      bool
 }
 
 func newCalculator() *calculator {
 	var c calculator
 	c.reader = bufio.NewReader(os.Stdin)
-	c.operators = map[string]func() int{
+	c.operations = map[string]func() int{
 		"+": c.sum,
 		"-": c.subtract,
 		"*": c.multiply,
@@ -56,7 +57,7 @@ func (c *calculator) divide() int {
 }
 
 func (c *calculator) validateInput(s string) error {
-	a, b, err := validateOperator(c, s)
+	a, b, err := validateOperation(c, s)
 	if err != nil {
 		return err
 	}
@@ -65,18 +66,19 @@ func (c *calculator) validateInput(s string) error {
 	if err != nil {
 		return err
 	}
-
 	if c.a > 10 || c.b > 10 {
 		return errorMathOperationFormat
 	}
+
 	return nil
 }
 
-func validateOperator(c *calculator, s string) (string, string, error) {
+func validateOperation(c *calculator, s string) (string, string, error) {
 	var opCount int = 0
 	var a, b string
+
 	for i := 0; i < len(s); i++ {
-		for k := range c.operators {
+		for k := range c.operations {
 			if opCount >= 2 {
 				return "", "", errorMathOperationFormat
 			}
@@ -87,12 +89,12 @@ func validateOperator(c *calculator, s string) (string, string, error) {
 			}
 		}
 	}
+
 	return a, b, nil
 }
 
 func validateOperands(c *calculator, a, b string) error {
 	var errAa, errBa, errAr, errBr error
-
 	c.a, errAa = strconv.Atoi(a)
 	c.b, errBa = strconv.Atoi(b)
 
@@ -135,7 +137,7 @@ func calculate(c *calculator) error {
 			return err
 		}
 
-		result := c.operators[c.operator]()
+		result := c.operations[c.operator]()
 
 		switch c.roman {
 		case true:
@@ -151,6 +153,7 @@ func calculate(c *calculator) error {
 
 func main() {
 	err := calculate(newCalculator())
+
 	if err != nil {
 		fmt.Printf(printOut, err)
 	}
