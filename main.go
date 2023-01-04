@@ -84,7 +84,7 @@ func validateOperation(c *calculator, s string) (string, string, error) {
 			}
 			if string(s[i]) == k {
 				opCount += 1
-				a, b = s[0:i], s[i+1:len(s)-2]
+				a, b = s[0:i], s[i+1:]
 				c.operator = k
 			}
 		}
@@ -131,6 +131,7 @@ func calculate(c *calculator) error {
 		}
 
 		input = strings.ReplaceAll(input, " ", "")
+		input = strings.TrimRight(input, "\n\r")
 
 		err = c.validateInput(input)
 		if err != nil {
